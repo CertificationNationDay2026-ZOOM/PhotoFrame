@@ -1,6 +1,6 @@
 /* ==========================================================
    PhotoFrame · Certification Nation Day 2026
-   Lógica principal: cámara, captura, descarga y subida a Drive
+   Lógica: cámara, selección de marco, captura, descarga y subida
    ========================================================== */
 
 // ==========================================================
@@ -9,9 +9,9 @@
 // ⚠️ Reemplaza esta URL con la de tu Google Apps Script (termina en /exec)
 const APPS_SCRIPT_URL = 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT';
 
-const CANVAS_SIZE = 1080;        // Tamaño final de la foto (cuadrada, en px)
-const JPEG_QUALITY = 0.92;       // Calidad (0 a 1)
-const MIRROR_FRONT_CAMERA = true; // Espeja la cámara frontal (efecto selfie)
+const CANVAS_SIZE = 1080;              // Tamaño final de la foto (cuadrada, en px)
+const JPEG_QUALITY = 0.92;             // Calidad (0 a 1)
+const MIRROR_FRONT_CAMERA = true;      // Espeja la cámara frontal (efecto selfie)
 
 // ==========================================================
 // ESTADO
@@ -19,9 +19,10 @@ const MIRROR_FRONT_CAMERA = true; // Espeja la cámara frontal (efecto selfie)
 let currentFrame = null;
 let currentFrameName = '';
 let stream = null;
-let facingMode = 'user'; // 'user' = frontal, 'environment' = trasera
+let facingMode = 'user';               // 'user' = frontal, 'environment' = trasera
 let capturedBlob = null;
 let isCapturing = false;
+let cameraReady = false;
 
 // ==========================================================
 // ELEMENTOS DEL DOM
@@ -32,44 +33,48 @@ const ctx = canvas.getContext('2d');
 const frameOverlay = document.getElementById('frameOverlay');
 const photoResult = document.getElementById('photoResult');
 const uploadStatus = document.getElementById('uploadStatus');
-const successBadge = document.getElementById('successBadge');
-const currentFrameNameEl = document.getElementById('currentFrameName');
 
-const screenHome = document.getElementById('screen-home');
 const screenCamera = document.getElementById('screen-camera');
 const screenPreview = document.getElementById('screen-preview');
 
 const captureBtn = document.getElementById('captureBtn');
 const flipBtn = document.getElementById('flipBtn');
 const backBtn = document.getElementById('backBtn');
+const closePreviewBtn = document.getElementById('closePreviewBtn');
 const retakeBtn = document.getElementById('retakeBtn');
 const downloadBtn = document.getElementById('downloadBtn');
+
+const framesStrip = document.getElementById('framesStrip');
+const frameThumbs = document.querySelectorAll('.frame-thumb');
 
 // ==========================================================
 // NAVEGACIÓN ENTRE PANTALLAS
 // ==========================================================
 function showScreen(screen) {
-    [screenHome, screenCamera, screenPreview].forEach(s => s.classList.remove('active'));
+    [screenCamera, screenPreview].forEach(s => s.classList.remove('active'));
     screen.classList.add('active');
-}
-
-// ==========================================================
-// CAMBIAR NOMBRE DEL MARCO ACTIVO EN LA CÁMARA
-// ==========================================================
-function setFrameName(name) {
-    currentFrameNameEl.textContent = name || 'Marco';
 }
 
 // ==========================================================
 // SELECCIÓN DE MARCO
 // ==========================================================
-document.querySelectorAll('.frame-card').forEach(card => {
-    card.addEventListener('click', () => {
-        currentFrame = card.dataset.frame;
-        currentFrameName = card.dataset.name || 'Marco';
-        setFrameName(currentFrameName);
-        iniciarCamara();
-    });
+function seleccionarMarco(thumb) {
+    currentFrame = thumb.dataset.frame;
+    currentFrameName = thumb.dataset.name || 'Marco';
+
+    // Actualizar estado visual
+    frameThumbs.forEach(t => t.classList.remove('active'));
+    thumb.classList.add('active');
+
+    // Actualizar el overlay en vivo si la cámara está abierta
+    if (cameraReady && frameOverlay) {
+        frameOverlay.src = currentFrame;
+    }
+}
+
+// Asignar evento a cada miniatura
+frameThumbs.forEach(thumb => {
+    thumb.addEventListener('click', () => seleccionarMarco(thumb));
 });
 
 // ==========================================================
@@ -78,6 +83,7 @@ document.querySelectorAll('.frame-card').forEach(card => {
 async function iniciarCamara() {
     try {
         detenerCamara();
+        cameraReady = false;
 
         // Verificar soporte
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -105,38 +111,37 @@ async function iniciarCamara() {
             }
         });
 
-        // Aplicar espejo si es cámara frontal
+        // Aplicar espejo a la cámara frontal
         aplicarEspejo();
 
-        // Cargar el marco superpuesto
-        frameOverlay.src = currentFrame;
-        frameOverlay.onload = () => showScreen(screenCamera);
-        frameOverlay.onerror = () => {
-            alert('No se pudo cargar el marco. Verifica que exista en la carpeta frames/.');
-            showScreen(screenHome);
-        };
+        // Cargar el marco elegido
+        if (currentFrame) {
+            frameOverlay.src = currentFrame;
+        }
+
+        cameraReady = true;
+        showScreen(screenCamera);
 
     } catch (err) {
         console.error('Error al acceder a la cámara:', err);
 
         let msg = 'No se pudo acceder a la cámara.';
         if (err.name === 'NotAllowedError') {
-            msg = 'Debes permitir el acceso a la cámara. Ve a los ajustes del navegador y actívalo.';
+            msg = 'Debes permitir el acceso a la cámara para usar la app. Ve a los ajustes del navegador y actívalo.';
         } else if (err.name === 'NotFoundError') {
             msg = 'No se encontró ninguna cámara en este dispositivo.';
         } else if (err.name === 'NotReadableError') {
             msg = 'La cámara está siendo usada por otra aplicación.';
         }
 
-        alert(msg + '\n\n(Recuerda que debe estar abierto en HTTPS y desde el navegador del celular, no dentro de otra app.)');
-        showScreen(screenHome);
+        alert(msg + '\n\n(Recuerda abrir la app desde el navegador del celular y en HTTPS.)');
     }
 }
 
 function aplicarEspejo() {
     const debeEspejar = MIRROR_FRONT_CAMERA && facingMode === 'user';
     video.style.transform = debeEspejar ? 'scaleX(-1)' : 'none';
-    // El marco NO se espeja, siempre se muestra correctamente orientado
+    // El marco nunca se espeja
     frameOverlay.style.transform = 'none';
 }
 
@@ -146,6 +151,7 @@ function detenerCamara() {
         stream = null;
     }
     video.srcObject = null;
+    cameraReady = false;
 }
 
 // ==========================================================
@@ -153,17 +159,19 @@ function detenerCamara() {
 // ==========================================================
 captureBtn.addEventListener('click', () => {
     if (isCapturing) return;
-    if (!video.videoWidth) return;
+    if (!cameraReady || !video.videoWidth || !currentFrame) return;
 
     isCapturing = true;
+    captureBtn.disabled = true;
 
-    // Animación visual de captura
+    // Flash blanco de feedback
     const flash = document.createElement('div');
-    flash.style.cssText = 'position:fixed;inset:0;background:#fff;opacity:0.8;z-index:9999;pointer-events:none;transition:opacity 0.35s;';
+    flash.style.cssText = 'position:fixed;inset:0;background:#fff;opacity:0.85;z-index:9999;pointer-events:none;transition:opacity 0.35s ease;';
     document.body.appendChild(flash);
     requestAnimationFrame(() => { flash.style.opacity = '0'; });
     setTimeout(() => flash.remove(), 400);
 
+    // Configurar canvas cuadrado
     canvas.width = CANVAS_SIZE;
     canvas.height = CANVAS_SIZE;
 
@@ -185,7 +193,7 @@ captureBtn.addEventListener('click', () => {
     ctx.drawImage(video, sx, sy, size, size, 0, 0, CANVAS_SIZE, CANVAS_SIZE);
     ctx.restore();
 
-    // Dibujar el marco encima (SIEMPRE sin espejar, con texto correcto)
+    // Dibujar el marco encima (siempre sin espejar)
     const frameImg = new Image();
     frameImg.crossOrigin = 'anonymous';
 
@@ -196,30 +204,33 @@ captureBtn.addEventListener('click', () => {
             if (!blob) {
                 alert('Error al generar la imagen. Intenta de nuevo.');
                 isCapturing = false;
+                captureBtn.disabled = false;
                 return;
             }
 
             capturedBlob = blob;
             photoResult.src = URL.createObjectURL(blob);
 
-            // Mostrar badge y resetear status
-            successBadge.style.display = 'flex';
+            // Resetear status
             uploadStatus.textContent = '';
             uploadStatus.className = 'status';
 
+            // Detener cámara y mostrar vista previa
             detenerCamara();
             showScreen(screenPreview);
 
-            // Subir a Drive (en paralelo)
+            // Subir a Drive en segundo plano
             subirADrive(blob);
 
             isCapturing = false;
+            captureBtn.disabled = false;
         }, 'image/jpeg', JPEG_QUALITY);
     };
 
     frameImg.onerror = () => {
         alert('No se pudo cargar el marco para la captura.');
         isCapturing = false;
+        captureBtn.disabled = false;
     };
 
     frameImg.src = currentFrame;
@@ -234,11 +245,28 @@ flipBtn.addEventListener('click', () => {
 });
 
 // ==========================================================
-// VOLVER AL HOME
+// CERRAR APP (botón X)
 // ==========================================================
 backBtn.addEventListener('click', () => {
     detenerCamara();
-    showScreen(screenHome);
+    // Intentar cerrar la pestaña (funciona si fue abierta por script).
+    // Si no, dejamos la pantalla en negro sin más.
+    window.close();
+    // Fallback: mostrar la cámara de nuevo (algunos navegadores no permiten close)
+    setTimeout(() => {
+        if (currentFrame) iniciarCamara();
+    }, 200);
+});
+
+// ==========================================================
+// CERRAR VISTA PREVIA (volver a la cámara)
+// ==========================================================
+closePreviewBtn.addEventListener('click', () => {
+    capturedBlob = null;
+    photoResult.src = '';
+    uploadStatus.textContent = '';
+    uploadStatus.className = 'status';
+    iniciarCamara();
 });
 
 // ==========================================================
@@ -249,7 +277,6 @@ retakeBtn.addEventListener('click', () => {
     photoResult.src = '';
     uploadStatus.textContent = '';
     uploadStatus.className = 'status';
-    successBadge.style.display = 'none';
     iniciarCamara();
 });
 
@@ -273,19 +300,18 @@ downloadBtn.addEventListener('click', () => {
 
     setTimeout(() => URL.revokeObjectURL(url), 2000);
 
-    // Feedback visual
-    const originalText = downloadBtn.querySelector('span').textContent;
-    downloadBtn.querySelector('span').textContent = '¡Guardado!';
-    setTimeout(() => {
-        downloadBtn.querySelector('span').textContent = originalText;
-    }, 2000);
+    // Feedback visual en el botón
+    const label = downloadBtn.querySelector('span');
+    const original = label.textContent;
+    label.textContent = '¡Guardado!';
+    setTimeout(() => { label.textContent = original; }, 1800);
 });
 
 // ==========================================================
 // SUBIR A GOOGLE DRIVE (vía Apps Script)
 // ==========================================================
 async function subirADrive(blob) {
-    // Verificar que la URL esté configurada
+    // Verificar configuración
     if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('PEGA_AQUI')) {
         uploadStatus.textContent = '⚠️ Falta configurar la URL de Google Apps Script';
         uploadStatus.className = 'status error';
@@ -296,12 +322,10 @@ async function subirADrive(blob) {
     uploadStatus.className = 'status loading';
 
     try {
-        // Convertir blob a base64
         const base64 = await blobToBase64(blob);
         const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
         const nombreArchivo = `PhotoFrame_${currentFrameName}_${fecha}.jpg`;
 
-        // Enviar como POST (application/x-www-form-urlencoded)
         const params = new URLSearchParams();
         params.append('image', base64);
         params.append('filename', nombreArchivo);
@@ -315,7 +339,7 @@ async function subirADrive(blob) {
             body: params.toString()
         });
 
-        // Con no-cors no podemos leer la respuesta, así que asumimos éxito
+        // Con no-cors no podemos ver la respuesta real; asumimos éxito
         uploadStatus.textContent = '✅ Foto guardada en Drive';
         uploadStatus.className = 'status success';
 
@@ -343,7 +367,24 @@ function blobToBase64(blob) {
 }
 
 // ==========================================================
-// LIMPIEZA AL CERRAR
+// INICIALIZACIÓN
+// ==========================================================
+async function init() {
+    // Verificar que haya al menos una miniatura
+    if (frameThumbs.length === 0) {
+        alert('No se encontraron marcos. Revisa la carpeta frames/.');
+        return;
+    }
+
+    // Seleccionar el primer marco por defecto
+    seleccionarMarco(frameThumbs[0]);
+
+    // Iniciar cámara directamente
+    await iniciarCamara();
+}
+
+// ==========================================================
+// LIMPIEZA AL CERRAR / CAMBIAR DE APP
 // ==========================================================
 window.addEventListener('beforeunload', detenerCamara);
 document.addEventListener('visibilitychange', () => {
@@ -351,3 +392,10 @@ document.addEventListener('visibilitychange', () => {
         detenerCamara();
     }
 });
+
+// Iniciar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
