@@ -7,7 +7,7 @@
 // CONFIGURACIÓN
 // ==========================================================
 // ⚠️ Reemplaza esta URL con la de tu Google Apps Script (termina en /exec)
-const APPS_SCRIPT_URL = 'PEGA_AQUI_TU_URL_DE_APPS_SCRIPT';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBNP7G6V0Dp2NbioXU56TNXrnTaSg56flX04chGsLXABTe0aZ0gqEWtQ-pORS4Zrxv/exec';
 
 const CANVAS_SIZE = 1080;              // Tamaño final de la foto (cuadrada, en px)
 const JPEG_QUALITY = 0.92;             // Calidad (0 a 1)
