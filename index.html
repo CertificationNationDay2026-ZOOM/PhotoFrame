@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0a0a0f">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -12,128 +12,87 @@
 </head>
 <body>
 
-    <!-- Fondo decorativo con gradientes -->
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
-
     <main class="app">
 
-        <!-- ============ PANTALLA 1: BIENVENIDA + SELECCIÓN DE MARCO ============ -->
-        <section id="screen-home" class="screen active">
-            <header class="home-header">
-                <div class="badge">📸 PhotoFrame</div>
-                <h1 class="title">
-                    Certification<br>
-                    <span class="gradient-text">Nation Day 2026</span>
-                </h1>
-                <p class="subtitle">Elige tu marco y crea un recuerdo increíble</p>
-            </header>
+        <!-- ============ PANTALLA 1: CÁMARA ============ -->
+        <section id="screen-camera" class="screen active">
 
-            <div class="section-label">
-                <span>Marcos disponibles</span>
-                <span class="count" id="framesCount">4</span>
-            </div>
-
-            <div class="frames-grid" id="framesContainer">
-                <button class="frame-card" data-frame="frames/marco1.png" data-name="Marco1">
-                    <div class="frame-thumb">
-                        <img src="frames/marco1.png" alt="Marco 1" loading="lazy">
-                    </div>
-                    <span class="frame-label">Marco 1</span>
-                </button>
-                <button class="frame-card" data-frame="frames/marco2.png" data-name="Marco2">
-                    <div class="frame-thumb">
-                        <img src="frames/marco2.png" alt="Marco 2" loading="lazy">
-                    </div>
-                    <span class="frame-label">Marco 2</span>
-                </button>
-                <button class="frame-card" data-frame="frames/marco3.png" data-name="Marco3">
-                    <div class="frame-thumb">
-                        <img src="frames/marco3.png" alt="Marco 3" loading="lazy">
-                    </div>
-                    <span class="frame-label">Marco 3</span>
-                </button>
-                <button class="frame-card" data-frame="frames/marco4.png" data-name="Marco4">
-                    <div class="frame-thumb">
-                        <img src="frames/marco4.png" alt="Marco 4" loading="lazy">
-                    </div>
-                    <span class="frame-label">Marco 4</span>
-                </button>
-            </div>
-
-            <footer class="home-footer">
-                <p>Toca un marco para empezar ✨</p>
-            </footer>
-        </section>
-
-        <!-- ============ PANTALLA 2: CÁMARA ============ -->
-        <section id="screen-camera" class="screen">
-            <header class="camera-header">
-                <button id="backBtn" class="icon-btn" aria-label="Volver">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <header class="top-bar">
+                <button id="backBtn" class="icon-btn" aria-label="Cerrar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
                 </button>
-                <div class="camera-info">
-                    <span class="dot"></span>
-                    <span id="currentFrameName">Marco</span>
-                </div>
+                <span class="top-title">PhotoFrame</span>
                 <button id="flipBtn" class="icon-btn" aria-label="Cambiar cámara">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M23 4v6h-6M1 20v-6h6"/>
                         <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
                     </svg>
                 </button>
             </header>
 
-            <div class="camera-viewport">
-                <video id="video" autoplay playsinline muted></video>
-                <img id="frameOverlay" class="frame-overlay" alt="">
-                <div class="camera-corners">
-                    <span></span><span></span><span></span><span></span>
+            <div class="viewport-wrapper">
+                <div class="viewport">
+                    <video id="video" autoplay playsinline muted></video>
+                    <img id="frameOverlay" class="frame-overlay" alt="">
                 </div>
             </div>
 
-            <div class="camera-controls">
-                <button id="captureBtn" class="shutter-btn" aria-label="Tomar foto">
-                    <span class="shutter-inner"></span>
-                    <span class="shutter-ring"></span>
+            <div class="frames-strip" id="framesStrip">
+                <button class="frame-thumb" data-frame="frames/marco1.png" data-name="Marco1">
+                    <img src="frames/marco1.png" alt="Marco 1" loading="lazy">
+                </button>
+                <button class="frame-thumb" data-frame="frames/marco2.png" data-name="Marco2">
+                    <img src="frames/marco2.png" alt="Marco 2" loading="lazy">
+                </button>
+                <button class="frame-thumb" data-frame="frames/marco3.png" data-name="Marco3">
+                    <img src="frames/marco3.png" alt="Marco 3" loading="lazy">
+                </button>
+                <button class="frame-thumb" data-frame="frames/marco4.png" data-name="Marco4">
+                    <img src="frames/marco4.png" alt="Marco 4" loading="lazy">
                 </button>
             </div>
 
-            <p class="camera-hint">Encuadra tu rostro dentro del marco</p>
+            <div class="capture-area">
+                <button id="captureBtn" class="shutter" aria-label="Tomar foto">
+                    <span></span>
+                </button>
+            </div>
+
         </section>
 
-        <!-- ============ PANTALLA 3: VISTA PREVIA ============ -->
+        <!-- ============ PANTALLA 2: VISTA PREVIA ============ -->
         <section id="screen-preview" class="screen">
-            <header class="camera-header">
-                <div class="camera-info">
-                    <span class="dot success"></span>
-                    <span>¡Foto capturada!</span>
-                </div>
+
+            <header class="top-bar">
+                <button id="closePreviewBtn" class="icon-btn" aria-label="Cerrar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+                <span class="top-title">Tu foto</span>
+                <div class="icon-btn-spacer"></div>
             </header>
 
-            <div class="preview-viewport">
+            <div class="preview-wrapper">
                 <img id="photoResult" alt="Tu foto">
-                <div id="successBadge" class="success-badge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                    </svg>
-                </div>
             </div>
 
             <p id="uploadStatus" class="status"></p>
 
             <div class="preview-actions">
-                <button id="retakeBtn" class="action-btn secondary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <button id="retakeBtn" class="btn btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
                         <path d="M3 3v5h5"/>
                     </svg>
                     <span>Repetir</span>
                 </button>
-                <button id="downloadBtn" class="action-btn primary">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <button id="downloadBtn" class="btn btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                         <polyline points="7 10 12 15 17 10"/>
                         <line x1="12" y1="15" x2="12" y2="3"/>
@@ -141,6 +100,7 @@
                     <span>Descargar</span>
                 </button>
             </div>
+
         </section>
 
     </main>
