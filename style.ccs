@@ -1,0 +1,244 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0a0a;
+    color: #fff;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.app {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+header {
+    text-align: center;
+    padding: 16px 20px 8px;
+    flex-shrink: 0;
+}
+
+header h1 {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+header p {
+    font-size: 13px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.step {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.step.active {
+    display: flex;
+}
+
+.step h2 {
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+/* Selección de marco */
+.frames {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
+    overflow-y: auto;
+}
+
+.frame-option {
+    background: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.frame-option:active {
+    transform: scale(0.96);
+    border-color: #4ade80;
+}
+
+.frame-option img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #222;
+}
+
+.frame-option span {
+    font-size: 13px;
+    color: #ccc;
+    font-weight: 500;
+}
+
+/* Cámara */
+.camera-container {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #000;
+    margin-bottom: 12px;
+}
+
+#video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.frame-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    object-fit: cover;
+}
+
+.camera-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 8px 20px 20px;
+    flex-shrink: 0;
+}
+
+.btn-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:active {
+    background: #333;
+}
+
+.btn-capture {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid #555;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+}
+
+.btn-capture::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: #fff;
+    transition: all 0.1s;
+}
+
+.btn-capture:active::after {
+    inset: 10px;
+}
+
+/* Vista previa */
+.preview-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #000;
+    margin-bottom: 12px;
+}
+
+#photoResult {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 16px;
+}
+
+.preview-controls {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.btn-secondary, .btn-primary {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #1a1a1a;
+    color: #fff;
+    border: 1px solid #333;
+}
+
+.btn-primary {
+    background: #4ade80;
+    color: #000;
+}
+
+.btn-primary:active, .btn-secondary:active {
+    transform: scale(0.97);
+}
+
+.status {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 10px;
+    min-height: 20px;
+    color: #888;
+    flex-shrink: 0;
+}
+
+.status.success { color: #4ade80; }
+.status.error { color: #f87171; }
+.status.loading { color: #fbbf24; }
