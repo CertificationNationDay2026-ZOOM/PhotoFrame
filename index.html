@@ -2,12 +2,64 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhotoFrame - Certification Nation Day</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>PhotoFrame - Certification Nation Day 2026</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body style="font-family: sans-serif; text-align: center; padding: 50px;">
-    <h1>📸 PhotoFrame App</h1>
-    <p>¡El enlace ya está funcionando!</p>
-    <p>Pronto aquí estarán los marcos para tomarse fotos.</p>
+<body>
+    <div class="app">
+        <header>
+            <h1>📸 PhotoFrame</h1>
+            <p>Certification Nation Day 2026</p>
+        </header>
+
+        <!-- PASO 1: Elegir marco -->
+        <section id="frameStep" class="step active">
+            <h2>Elige tu marco favorito</h2>
+            <div class="frames" id="framesContainer">
+                <button class="frame-option" data-frame="frames/marco1.png" data-name="Marco1">
+                    <img src="frames/marco1.png" alt="Marco 1">
+                    <span>Marco 1</span>
+                </button>
+                <button class="frame-option" data-frame="frames/marco2.png" data-name="Marco2">
+                    <img src="frames/marco2.png" alt="Marco 2">
+                    <span>Marco 2</span>
+                </button>
+                <button class="frame-option" data-frame="frames/marco3.png" data-name="Marco3">
+                    <img src="frames/marco3.png" alt="Marco 3">
+                    <span>Marco 3</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- PASO 2: Cámara -->
+        <section id="cameraStep" class="step">
+            <div class="camera-container">
+                <video id="video" autoplay playsinline muted></video>
+                <img id="frameOverlay" class="frame-overlay" alt="">
+            </div>
+            <div class="camera-controls">
+                <button id="backBtn" class="btn-icon" aria-label="Volver">←</button>
+                <button id="captureBtn" class="btn-capture" aria-label="Tomar foto"></button>
+                <button id="flipBtn" class="btn-icon" aria-label="Cambiar cámara">🔄</button>
+            </div>
+        </section>
+
+        <!-- PASO 3: Vista previa -->
+        <section id="previewStep" class="step">
+            <div class="preview-container">
+                <img id="photoResult" alt="Tu foto">
+            </div>
+            <div class="preview-controls">
+                <button id="retakeBtn" class="btn-secondary">↻ Repetir</button>
+                <button id="downloadBtn" class="btn-primary">⬇ Descargar</button>
+            </div>
+            <p id="uploadStatus" class="status"></p>
+        </section>
+    </div>
+
+    <canvas id="canvas" hidden></canvas>
+    <script src="app.js"></script>
 </body>
 </html>
