@@ -318,9 +318,6 @@ async function subirADrive(blob) {
         return;
     }
 
-    uploadStatus.textContent = '⏳ Guardando en Drive...';
-    uploadStatus.className = 'status loading';
-
     try {
         const base64 = await blobToBase64(blob);
         const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
@@ -339,9 +336,6 @@ async function subirADrive(blob) {
             body: params.toString()
         });
 
-        // Con no-cors no podemos ver la respuesta real; asumimos éxito
-        uploadStatus.textContent = '✅ Foto guardada en Drive';
-        uploadStatus.className = 'status success';
 
     } catch (err) {
         console.error('Error al subir:', err);
