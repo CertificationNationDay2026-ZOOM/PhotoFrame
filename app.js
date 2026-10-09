@@ -339,8 +339,6 @@ async function subirADrive(blob) {
 
     } catch (err) {
         console.error('Error al subir:', err);
-        uploadStatus.textContent = '❌ Error al guardar en Drive';
-        uploadStatus.className = 'status error';
     }
 }
 
